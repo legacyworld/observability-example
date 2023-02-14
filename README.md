@@ -1,4 +1,4 @@
-### Overview
+# Overview
 
 This repo contains a small python service using flask. The service is available in 4 stages. 
 
@@ -20,25 +20,17 @@ This repo contains a small python service using flask. The service is available 
 
 11 - instrumented with OTEL instead of Elastic APM
 
-### Requirements
-Redis is required for the services to run.
+This repo also includes "selenium" to simulate RUM.
+# Requirements
+docker-compose or kubernetes is required.
 
-```
-docker run -p 6379:6379 -d redis
-```
+## docker-compose
+### Build your own image
+At `services` directory,
 
+`docker build -t observability-example_flask .`
 
-A Python venv is recommended:
-```
-virtualenv -p python3 .venv
-source .venv/bin/activate
-```
-
-Install dependencies:
-```
-pip install -r requirements.txt
-```
-
+### Configure APM server credentials
 Before running the services, make sure you provide the following endpoints and credentials:
 ```
 .env: 
@@ -47,28 +39,24 @@ SECRET_TOKEN
 SERVER_URL
 OTEL_EXPORTER_OTLP_ENDPOINT
 OTEL_EXPORTER_OTLP_HEADERS
-
-
-filebeat.yml:
- 
-cloud.id: deploymentname:secret123
-cloud.auth: elastic:secret123
-or 
-output.elasticsearch:
-  hosts: ["localhost:9200"]
-  username: "elastic"
-  password: "changeme"
 ```
 
-You can download Filebeat here: https://www.elastic.co/downloads/beats/filebeat
+### Run docker-compose
+`docker-compose up -d`
+
+If you run on M1 Mac, change the image of selenium-svc to "seleniarm/standalone-chromium"
 
 APM-Server, Elasticsearch and Kibana also need to be running. You can find more information about the Elastic Stack [here](https://www.elastic.co/elastic-stack/)
 
-### Running the Python Services and loadgen:
-To run the python services, execute the following command for the file you'd like to run:
-```
-sh loadgen.sh
-```
+## Kubernetes
+`kubectl apply -f selenium.yml`
+
+# Access to Selenium
+## docker-compose
+VNC to `localhost:5900`
+
+## Kubernetes
+`selenium-svc` is conigured to use NodePort. Check the node address and port number by `kubectl get svc selenium-svc` and `kubectl get node -o wide`
 
 ### Screenshots of Kibana
 
