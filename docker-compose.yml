@@ -1,0 +1,114 @@
+version: '3.7'
+services:
+  redis:
+    image: redis
+    container_name: redis-svc
+    ports:
+      - 6379:6379
+  flask1:
+    image: observability-example_flask
+    container_name: flask1-svc
+    command: python -u /src/services/01-app-uninstrumented.py
+    ports:
+      - 5001:5001
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask2:
+    image: observability-example_flask
+    container_name: flask2-svc
+    command: python -u /src/services/02-app-instrumented.py
+    ports:
+      - 5002:5002
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask3:
+    image: observability-example_flask
+    container_name: flask3-svc
+    command: python -u /src/services/03-app-instrumented-handled-errors.py
+    ports:
+      - 5003:5003
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask4:
+    image: observability-example_flask
+    container_name: flask4-svc
+    command: python -u /src/services/04-app-instrumented-custom-span.py
+    ports:
+      - 5004:5004
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask5:
+    image: observability-example_flask
+    container_name: flask5-svc
+    command: python -u /src/services/05-app-instrumented-custom-context.py
+    ports:
+      - 5005:5005
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask6:
+    image: observability-example_flask
+    container_name: flask6-svc
+    command: python -u /src/services/06-app-ecs-logging.py
+    ports:
+      - 5006:5006
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask7:
+    image: observability-example_flask
+    container_name: flask7-svc
+    command: python -u /src/services/07-app-ecs-logging-distributed.py
+    ports:
+      - 5007:5007
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask8:
+    image: observability-example_flask
+    container_name: flask8-svc
+    command: python -u /src/services/08-app-ecs-logging-distributed.py
+    ports:
+      - 5008:5008
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  flask11:
+    image: observability-example_flask
+    container_name: flask11-svc
+    command: python -u /src/services/11-app-otel.py
+    ports:
+      - 5011:5011
+    volumes:
+      - ./:/src
+    depends_on:
+      - redis
+  selenium-app:
+    container_name: selenium-app
+    image: observability-example_flask
+    ports:
+      - 5022:5022
+    command: /bin/sh -c "sleep 10 && python -u /src/services/selenium_app.py"
+    volumes:
+      - ./:/src
+    depends_on:
+      - flask11
+  selenium:
+    container_name: selenium-svc
+    image: selenium/standalone-chrome
+    ports:
+      - 4444:4444
+      - 5900:5900
+    shm_size: "2gb"

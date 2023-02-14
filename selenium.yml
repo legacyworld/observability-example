@@ -1,0 +1,522 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elastic
+data:
+  .env: |-
+    SECRET_TOKEN="<Token>"
+    SERVER_URL="<APM URL>"
+    OTEL_EXPORTER_OTLP_ENDPOINT="<APM URL>"
+    OTEL_RESOURCE_ATTRIBUTES="service.name=11-app-otel,service.version=1.0.0,deployment.environment=dev"
+    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer%elastic"
+    OTEL_METRICS_EXPORTER="otlp"
+    OTEL_LOGS_EXPORTER="otlp"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: redis
+  name: redis
+spec:
+  containers:
+  - image: redis
+    name: redis
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask1
+  name: flask1
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask1
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/01-app-uninstrumented.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5001
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask2
+  name: flask2
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask2
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/02-app-instrumented.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5002
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask3
+  name: flask3
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask3
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/03-app-instrumented-handled-errors.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5003
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask4
+  name: flask4
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask4
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/04-app-instrumented-custom-span.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5004
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask5
+  name: flask5
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask5
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/05-app-instrumented-custom-context.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5005
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask6
+  name: flask6
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask6
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/06-app-ecs-logging.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5006
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask7
+  name: flask7
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask7
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/07-app-ecs-logging-distributed.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5007
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask8
+  name: flask8
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask8
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/08-app-ecs-logging-distributed.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5008
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: flask11
+  name: flask11
+spec:
+  volumes:
+    - name: env
+      configMap:
+        name: elastic
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: flask11
+    volumeMounts:
+    - name: env
+      mountPath: /src2
+    command: ["/bin/sh","-c","cp /src2/.env /src/.env && python -u /src/services/11-app-otel.py"]
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      exec:
+        command:
+        - /bin/bash
+        - -c
+        - python /src/services/redis-check.py
+    ports:
+    - containerPort: 5011
+  restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: selenium-app
+  name: selenium-app
+spec:
+  containers:
+  - image: public.ecr.aws/r2i8h8s4/observability-example_flask
+    name: selenium-app
+    command: ["/bin/sh","-c","sleep 10 && python -u /src/services/selenium_app.py"]
+    ports:
+    - containerPort: 5022
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: selenium
+  name: selenium
+spec:
+  containers:
+  - image: selenium/standalone-chrome
+    name: selenium
+    resources:
+      requests:
+        memory: "2Gi"
+    ports:
+    - containerPort: 4444
+    - containerPort: 5900
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: redis-svc
+  name: redis-svc
+  namespace: default
+spec:
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+    name: redis-port
+  selector:
+    app: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask1-svc
+  name: flask1-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5001
+    protocol: TCP
+    targetPort: 5001
+    name: flask1-port
+  selector:
+    app: flask1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask2-svc
+  name: flask2-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5002
+    protocol: TCP
+    targetPort: 5002
+    name: flask2-port
+  selector:
+    app: flask2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask3-svc
+  name: flask3-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5003
+    protocol: TCP
+    targetPort: 5003
+    name: flask3-port
+  selector:
+    app: flask3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask4-svc
+  name: flask4-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5004
+    protocol: TCP
+    targetPort: 5004
+    name: flask4-port
+  selector:
+    app: flask4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask5-svc
+  name: flask5-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5005
+    protocol: TCP
+    targetPort: 5005
+    name: flask5-port
+  selector:
+    app: flask5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask6-svc
+  name: flask6-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5006
+    protocol: TCP
+    targetPort: 5006
+    name: flask6-port
+  selector:
+    app: flask6
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask7-svc
+  name: flask7-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5007
+    protocol: TCP
+    targetPort: 5007
+    name: flask7-port
+  selector:
+    app: flask7
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask8-svc
+  name: flask8-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5008
+    protocol: TCP
+    targetPort: 5008
+    name: flask8-port
+  selector:
+    app: flask8
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: flask11-svc
+  name: flask11-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5011
+    protocol: TCP
+    targetPort: 5011
+    name: flask11-port
+  selector:
+    app: flask11
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: selenium-app-svc
+  name: selenium-app-svc
+  namespace: default
+spec:
+  ports:
+  - port: 5022
+    protocol: TCP
+    targetPort: 5022
+    name: selenium-app-port
+  selector:
+    app: selenium-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: selenium-svc
+  name: selenium-svc
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 4444
+    protocol: TCP
+    targetPort: 4444
+    name: selenium-port-4444
+  - port: 5900
+    protocol: TCP
+    targetPort: 5900
+    name: selenium-port-5900
+  selector:
+    app: selenium

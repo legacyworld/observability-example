@@ -21,7 +21,7 @@ handler = logging.FileHandler(filename='/tmp/service1.log')
 logger.addHandler(handler)
 app = Flask(__name__)
 
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.Redis(host='redis-svc', port=6379, db=0)
 r.ping()
 
 # redis, slow and fast requests
@@ -53,7 +53,6 @@ def endpoint1():
     if random.randint(0, 9) < 1:
         time.sleep(0.1)
         raise RuntimeError('unexpected error')
-
-    return "endpoint1"
+    return __file__
 
 app.run(host='0.0.0.0', port=5001)

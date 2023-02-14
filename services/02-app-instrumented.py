@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import os
 from dotenv import load_dotenv
 
@@ -32,8 +32,7 @@ app.config['ELASTIC_APM'] = {
 }
 apm = ElasticAPM(app)
 
-
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.Redis(host='redis-svc', port=6379, db=0)
 r.ping()
 
 # redis, slow and fast requests
@@ -66,7 +65,7 @@ def endpoint1():
         time.sleep(0.1)
         raise RuntimeError('unexpected error')
 
-    return "endpoint1"
+    return render_template('index.html',name=__file__)
 
 
 app.run(host='0.0.0.0', port=5002)
