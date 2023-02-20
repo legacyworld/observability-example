@@ -50,8 +50,8 @@ logger.setLevel(logging.ERROR)
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
 
-# Log to a file
-handler = logging.FileHandler(filename='/tmp/service11.log')
+# Log to Stream
+handler = logging.StreamHandler()
 logger.addHandler(handler)
 app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)

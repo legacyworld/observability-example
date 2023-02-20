@@ -23,8 +23,8 @@ logger.setLevel(logging.ERROR)
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
 
-# Log to a file
-handler = logging.FileHandler(filename='/tmp/service8.log')
+# Log to Stream
+handler = logging.StreamHandler()
 handler.setFormatter(ecs_logging.StdlibFormatter())
 logger.addHandler(handler)
 
