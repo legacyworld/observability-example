@@ -65,7 +65,7 @@ def endpoint1():
         time.sleep(0.1)
         raise RuntimeError('unexpected error')
 
-    return render_template('index.html',name=__file__)
+    return render_template('index.html',name=__file__,server=os.environ["SERVER_URL"])
 
 
 app.run(host='0.0.0.0', port=5002)

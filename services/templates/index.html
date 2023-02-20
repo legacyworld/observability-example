@@ -5,7 +5,7 @@
     <script>
 elasticApm.init({
     serviceName: "my-frontend-service",
-    serverUrl: '<APM URL>',
+    serverUrl: "{{server}}",
     pageLoadTraceId: "{{ apm["trace_id"] }}",
     pageLoadSpanId: "{{ apm["span_id"]() }}",
     pageLoadSampled: {{ apm["is_sampled_js"] }}

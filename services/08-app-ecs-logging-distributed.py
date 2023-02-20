@@ -99,6 +99,6 @@ def endpoint1():
 
     response = requests.get(url='http://flask11-svc:5011/endpoint1')
 
-    return render_template('index.html',name=__file__)
+    return render_template('index.html',name=__file__,server=os.environ["SERVER_URL"])
 
 app.run(host='0.0.0.0', port=5008)
