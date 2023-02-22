@@ -112,3 +112,13 @@ services:
       - 4444:4444
       - 5900:5900
     shm_size: "2gb"
+  elastic-agent:
+    image: docker.elastic.co/beats/elastic-agent:8.5.3
+    container_name: elastic-agent
+    restart: always
+    user: root
+    env_file:
+    - ./.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
