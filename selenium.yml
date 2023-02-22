@@ -4,13 +4,13 @@ metadata:
   name: elastic
 data:
   .env: |-
-    SECRET_TOKEN="<Token>"
     SERVER_URL="<APM URL>"
-    OTEL_EXPORTER_OTLP_ENDPOINT="<APM URL>"
-    OTEL_RESOURCE_ATTRIBUTES="service.name=11-app-otel,service.version=1.0.0,deployment.environment=dev"
-    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer%<Token>"
-    OTEL_METRICS_EXPORTER="otlp"
+    SECRET_TOKEN="<Token>"
+    OTEL_EXPORTER_OTLP_ENDPOINT=${SERVER_URL}
+    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer%${SECRET_TOKEN}"
     OTEL_LOGS_EXPORTER="otlp"
+    OTEL_METRICS_EXPORTER="otlp"
+    OTEL_RESOURCE_ATTRIBUTES="service.name=11-app-otel,service.version=1.0.0,deployment.environment=dev"
 ---
 apiVersion: v1
 kind: Pod
