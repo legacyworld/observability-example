@@ -25,20 +25,33 @@ This repo also includes "selenium" to simulate RUM.
 docker-compose or kubernetes is required.
 
 ## docker-compose
+This `docker-compose.yml` automatically creates Elastic Agent and enroll in Fleet.
+
 ### Build your own image
 At `services` directory,
 
 `docker build -t observability-example_flask .`
 
-### Configure APM server credentials
-Before running the services, make sure you provide the following endpoints and credentials:
+### Configure APM server Fleet server information
+
+To get the value of `<Token>` and `<APM URL>`, refer to this link
+https://www.elastic.co/guide/en/apm/guide/current/apm-quick-start.html#add-apm-integration
+
+To get the value of `<Enrollemnt Token>` and `<Fleet URL>`, refer to this link
+https://www.elastic.co/guide/en/fleet/current/elastic-agent-container.html#_step_3_run_the_elastic_agent_image
 ```
 .env: 
 
-SECRET_TOKEN
-SERVER_URL
-OTEL_EXPORTER_OTLP_ENDPOINT
-OTEL_EXPORTER_OTLP_HEADERS
+SECRET_TOKEN="<Token>"
+SERVER_URL="<APM URL>"
+OTEL_METRICS_EXPORTER="otlp"
+OTEL_EXPORTER_OTLP_ENDPOINT=${SERVER_URL}
+OTEL_RESOURCE_ATTRIBUTES="service.name=11-app-otel,service.version=1.0.0,deployment.environment=dev"
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer%${SECRET_TOKEN}"
+OTEL_LOGS_EXPORTER="otlp"
+FLEET_ENROLLMENT_TOKEN="<Enrollment Token>"
+FLEET_ENROLL=1
+FLEET_URL="<Fleet URL>"
 ```
 
 ### Run docker-compose
@@ -60,13 +73,13 @@ metadata:
   name: elastic
 data:
   .env: |-
-    SECRET_TOKEN="<Token>"
     SERVER_URL="<APM URL>"
-    OTEL_EXPORTER_OTLP_ENDPOINT="<APM URL>"
-    OTEL_RESOURCE_ATTRIBUTES="service.name=11-app-otel,service.version=1.0.0,deployment.environment=dev"
-    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer%<Token>"
-    OTEL_METRICS_EXPORTER="otlp"
+    SECRET_TOKEN="<Token>"
+    OTEL_EXPORTER_OTLP_ENDPOINT=${SERVER_URL}
+    OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer%${SECRET_TOKEN}"
     OTEL_LOGS_EXPORTER="otlp"
+    OTEL_METRICS_EXPORTER="otlp"
+    OTEL_RESOURCE_ATTRIBUTES="service.name=11-app-otel,service.version=1.0.0,deployment.environment=dev"
 ```
 `kubectl apply -f selenium.yml`
 
