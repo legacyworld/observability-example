@@ -43,6 +43,8 @@ At `services` directory,
 
 `docker build -t observability-example_flask .`
 
+If you build image on M1/M2 mac and run them on Intel processor, don't forget to add "--platform linux/amd64 "
+
 #### Configure APM server Fleet server information
 
 To get the value of `<Token>` and `<APM URL>`, refer to this link
