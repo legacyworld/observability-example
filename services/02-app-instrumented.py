@@ -47,19 +47,19 @@ def endpoint1():
     # slow down the request 10% of the time
     if random.randint(0,9) < 1:
         time.sleep(0.02)
-        logger.info('slow request')
+        logger.info('ERR-1000,slow request')
     else:
-        logger.info('fast request')
+        logger.info('INFO-1000,fast request')
 
     # we'll try to do something here that might fail
     try:
         # we fail for 10% of all requests
         if random.randint(0, 9) < 1:
             time.sleep(0.1)
-            raise RuntimeError('expected error, will be handled')
+            raise RuntimeError('CRITICAL-1000,expected error, will be handled')
     except Exception as e:
         logger.error(e)
-        return "endpoint1, error"
+        return "CRITICAL-2000,endpoint1, error"
 
     if random.randint(0, 9) < 1:
         time.sleep(0.1)
